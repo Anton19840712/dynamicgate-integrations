@@ -1,0 +1,54 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>HLS Stream Viewer</title>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+</head>
+<body>
+    <h2>Потоковое видео</h2>
+    <video id="video" width="640" height="480" controls autoplay muted></video>
+    <p id="status">Запуск потока...</p>
+
+    <script>
+        const statusText = document.getElementById('status');
+        const video = document.getElementById('video');
+        const hlsUrl = 'http://localhost:5106/hls/stream_channel2.m3u8';
+        const startStreamUrl = 'http://localhost:5106/api/stream/start/2';
+
+        fetch(startStreamUrl)
+            .then(response => {
+                if (!response.ok) throw new Error('Не удалось запустить поток');
+                statusText.textContent = 'Ожидание инициализации...';
+                return new Promise(resolve => setTimeout(resolve, 3000)); // 3 сек вместо 15
+            })
+            .then(() => {
+                if (Hls.isSupported()) {
+                    const hls = new Hls();
+                    hls.loadSource(hlsUrl);
+                    hls.attachMedia(video);
+                    hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                        video.play();
+                        statusText.textContent = 'Поток запущен';
+                    });
+                    hls.on(Hls.Events.ERROR, (event, data) => {
+                        console.error('HLS Error:', data);
+                        statusText.textContent = `Ошибка потока: ${data.details || 'неизвестная ошибка'}`;
+                    });
+                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                    video.src = hlsUrl;
+                    video.addEventListener('loadedmetadata', () => {
+                        video.play();
+                        statusText.textContent = 'Поток запущен (нативно)';
+                    });
+                } else {
+                    statusText.textContent = 'Ваш браузер не поддерживает HLS';
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка запуска потока:', error);
+                statusText.textContent = `Ошибка: ${error.message}`;
+            });
+    </script>
+</body>
+</html>

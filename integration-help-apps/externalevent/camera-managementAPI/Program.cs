@@ -1,0 +1,49 @@
+using System;
+using CameraManagementAPI.Services;
+using CameraManagementAPI.Middleware;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new() { Title = "Camera Management API", Version = "v1" });
+});
+
+builder.Services.AddSingleton<CameraService>();
+builder.Services.AddHttpClient<EventSubscriptionService>();
+builder.Services.AddSingleton<EventSubscriptionService>();
+
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+
+var app = builder.Build();
+
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+	c.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+});
+
+// Remove HTTPS redirection for simplicity
+// app.UseHttpsRedirection();
+
+// Add Basic Auth middleware
+app.UseMiddleware<BasicAuthMiddleware>();
+
+app.UseRouting();
+app.UseAuthorization();
+app.MapControllers();
+
+// Configure to listen on port 8080
+//app.Urls.Add("http://0.0.0.0:8080");
+
+Console.WriteLine("Camera Management API starting on http://0.0.0.0:7080");
+Console.WriteLine("Swagger available at http://0.0.0.0:7080/swagger");
+
+app.Run("http://0.0.0.0:7080");
