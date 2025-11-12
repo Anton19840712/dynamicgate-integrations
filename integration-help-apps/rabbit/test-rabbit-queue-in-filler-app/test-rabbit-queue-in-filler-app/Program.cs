@@ -8,8 +8,8 @@ class Program
 		var factory = new ConnectionFactory()
 		{
 			HostName = "localhost",
-			UserName = "user1",
-			Password = "pass1"
+			UserName = "service",
+			Password = "A1qwert"
 		};
 
 		using var connection = factory.CreateConnection();
@@ -17,7 +17,7 @@ class Program
 
 		string[] queues =
 		{
-			"channel_out"
+			"dev_channel_out"
 		};
 
 		//		string[] queues =
