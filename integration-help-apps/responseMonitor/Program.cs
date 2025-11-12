@@ -208,17 +208,36 @@ Console.WriteLine();
 Console.WriteLine("Endpoint для приёма:");
 Console.WriteLine("http://localhost:5000/api/receive");
 Console.WriteLine();
-Console.WriteLine("Открываю браузер...");
+Console.WriteLine("Проверяю браузер...");
 
 var url = "http://localhost:5000";
 try
 {
-	System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+	// Проверяем, не открыт ли уже браузер на этом порту
+	using var httpClient = new HttpClient();
+	httpClient.Timeout = TimeSpan.FromMilliseconds(500);
+
+	bool alreadyOpen = false;
+	try
 	{
-		FileName = url,
-		UseShellExecute = true
-	});
-	Console.WriteLine("Браузер запущен");
+		var response = await httpClient.GetAsync(url);
+		alreadyOpen = true;
+		Console.WriteLine("Браузер уже открыт - страница будет обновлена автоматически через SignalR");
+	}
+	catch
+	{
+		// Порт не отвечает - значит это первый запуск
+	}
+
+	if (!alreadyOpen)
+	{
+		System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo
+		{
+			FileName = url,
+			UseShellExecute = true
+		});
+		Console.WriteLine("Браузер запущен");
+	}
 }
 catch (Exception ex)
 {
