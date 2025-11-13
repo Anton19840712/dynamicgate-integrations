@@ -1,14 +1,10 @@
-using System.Text;
+﻿using System.Text;
 using RabbitMQ.Client;
 
 class Program
 {
 	static void Main()
 	{
-		Console.WriteLine("====================================================");
-		Console.WriteLine("НАГРУЗОЧНОЕ ТЕСТИРОВАНИЕ OutChannelListener");
-		Console.WriteLine("====================================================");
-		Console.WriteLine();
 
 		var factory = new ConnectionFactory()
 		{
@@ -133,24 +129,6 @@ class Program
 		Console.WriteLine($"Отправлено: {sentCount} сообщений");
 		Console.WriteLine($"Время: {duration:F2} секунд");
 		Console.WriteLine($"Средняя скорость: {actualRate:F2} msg/sec");
-		Console.WriteLine("====================================================");
-		Console.WriteLine();
-		Console.WriteLine("МОНИТОРИНГ:");
-		Console.WriteLine("1. Проверьте логи DynamicGateway на наличие ошибок");
-		Console.WriteLine("2. Проверьте ResponseMonitor - все ли сообщения получены");
-		Console.WriteLine("3. Проверьте RabbitMQ Management UI:");
-		Console.WriteLine("   http://localhost:15672");
-		Console.WriteLine("   - Размер очереди dev_channel_out");
-		Console.WriteLine("   - Message rates");
-		Console.WriteLine("   - Unacked messages");
-		Console.WriteLine();
-		Console.WriteLine("ВОПРОСЫ ДЛЯ АНАЛИЗА:");
-		Console.WriteLine("- Есть ли requeue (BasicNack)?");
-		Console.WriteLine("- Накапливаются ли сообщения в очереди?");
-		Console.WriteLine("- Успевает ли HTTP endpoint обрабатывать?");
-		Console.WriteLine("- Нужен ли rate limiting / буферизация?");
-		Console.WriteLine("- Нужна ли dead letter queue?");
-		Console.WriteLine();
 	}
 
 	static void SendMessage(IModel channel, string queue, int index)
