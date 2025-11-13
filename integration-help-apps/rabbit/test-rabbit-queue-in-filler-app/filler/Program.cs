@@ -1,6 +1,9 @@
 ﻿using System.Text;
 using RabbitMQ.Client;
 
+/// <summary>
+/// Main program class to send test messages to RabbitMQ queues.
+/// </summary>
 class Program
 {
 	static void Main()
